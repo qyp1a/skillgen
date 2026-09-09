@@ -1,6 +1,6 @@
 ---
 name: {{name}}
-description: "{{description}}"
+description: {{description_yaml}}
 ---
 
 # {{name_title}}
