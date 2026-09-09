@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 /**
  * skillgen — Generate standards-compliant Agent Skills (SKILL.md)
- * Interactive &amp; zero-dependency. Bilingual: 中文 / English.
+ * Interactive & zero-dependency. Bilingual: 中文 / English.
  */
 import { parseArgs } from 'node:util';
 import { readFileSync, existsSync } from 'node:fs';
@@ -45,7 +45,7 @@ function detectUiLang() {
 
 function resolveUiLang() {
   if (values.ui) return values.ui === 'zh' ? 'zh' : 'en';
-  if (values.lang &amp;&amp; values.lang !== 'both') return values.lang;
+  if (values.lang && values.lang !== 'both') return values.lang;
   return detectUiLang();
 }
 
@@ -75,13 +75,13 @@ ${t('version')} / ${t('help')}
   npx skillgen --name my-skill --type cli --lang en --desc "..." --author you
 
 参数 / Options:
-  --name &lt;name&gt;     ${t('uiName')}
-  --desc &lt;text&gt;     ${t('uiDesc')}
-  --desc-en &lt;text&gt;  ${t('uiDescEn')}
-  --type &lt;type&gt;     basic | cli | workflow | mcp
-  --lang &lt;lang&gt;     zh | en | both
-  --ui &lt;lang&gt;       CLI 界面语言 / UI language: zh | en (default: auto)
-  --author &lt;name&gt;   ${t('uiAuthor')}
+  --name <name>     ${t('uiName')}
+  --desc <text>     ${t('uiDesc')}
+  --desc-en <text>  ${t('uiDescEn')}
+  --type <type>     basic | cli | workflow | mcp
+  --lang <lang>     zh | en | both
+  --ui <lang>       CLI 界面语言 / UI language: zh | en (default: auto)
+  --author <name>   ${t('uiAuthor')}
   --force           覆盖已存在目录 / overwrite existing directory
   --yes             跳过交互，使用默认值 / skip prompts, use defaults
 `);
@@ -100,19 +100,19 @@ async function runInteractive(t) {
       error: t('nameInvalid')
     });
 
-    const desc = await session.ask(t('uiDesc'), { validate: () =&gt; true, def: `A ${name} skill.` });
+    const desc = await session.ask(t('uiDesc'), { validate: () => true, def: `A ${name} skill.` });
 
-    const type = await session.choose(t('uiType'), TYPES, (k) =&gt; t(`types.${k}`));
-    const lang = await session.choose(t('uiLang'), LANGS, (k) =&gt; t(`langs.${k}`));
+    const type = await session.choose(t('uiType'), TYPES, (k) => t(`types.${k}`));
+    const lang = await session.choose(t('uiLang'), LANGS, (k) => t(`langs.${k}`));
 
     let descEn;
     if (lang === 'both') {
-      descEn = await session.ask(t('uiDescEn'), { validate: () =&gt; true, def: desc });
+      descEn = await session.ask(t('uiDescEn'), { validate: () => true, def: desc });
     }
-    const author = await session.ask(t('uiAuthor'), { validate: () =&gt; true, def: gitUserName() });
+    const author = await session.ask(t('uiAuthor'), { validate: () => true, def: gitUserName() });
 
     let force = values.force;
-    if (!force &amp;&amp; existsSync(join(process.cwd(), name))) {
+    if (!force && existsSync(join(process.cwd(), name))) {
       force = await session.confirm(t('uiOverwrite'));
     }
     return { name, desc, descEn, type, lang, author, force };
@@ -139,7 +139,7 @@ async function main() {
   }
 
   let opts;
-  const nonInteractive = values.name &amp;&amp; values.type &amp;&amp; values.lang;
+  const nonInteractive = values.name && values.type && values.lang;
   if (nonInteractive) {
     if (!validateName(values.name)) {
       console.error(t('nameInvalid'));
@@ -162,15 +162,15 @@ async function main() {
       author: values.author || (values.yes ? gitUserName() : undefined),
       force: values.force
     };
-    if (!opts.author &amp;&amp; !values.yes) {
+    if (!opts.author && !values.yes) {
       const session = promptSession();
       try {
-        opts.author = await session.ask(t('uiAuthor'), { validate: () =&gt; true, def: gitUserName() });
+        opts.author = await session.ask(t('uiAuthor'), { validate: () => true, def: gitUserName() });
       } finally {
         session.close();
       }
     }
-    if (!opts.force &amp;&amp; existsSync(join(process.cwd(), opts.name))) {
+    if (!opts.force && existsSync(join(process.cwd(), opts.name))) {
       console.error(t('dirExists'));
       process.exit(1);
     }
@@ -183,7 +183,7 @@ async function main() {
     console.log(`\n${t('generated')} ${dir}`);
     console.log(`${t('files')}`);
     for (const f of files) console.log(`  - ${f}`);
-    console.log(`\n${t('nextSteps')} ${t('nextStepInstall').replace('&lt;name&gt;', opts.name)}`);
+    console.log(`\n${t('nextSteps')} ${t('nextStepInstall').replace('<name>', opts.name)}`);
   } catch (err) {
     console.error(`✗ ${err.message}`);
     process.exit(1);
