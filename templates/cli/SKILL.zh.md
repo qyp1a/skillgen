@@ -20,7 +20,7 @@ description: "{{description}}"
 
 | 命令 | 用途 | 示例 |
 | --- | --- | --- |
-| `xxx &lt;子命令&gt;` | ... | `xxx &lt;子命令&gt; --flag` |
+| `xxx <子命令>` | ... | `xxx <子命令> --flag` |
 
 ## 标准工作流
 1. 验证工具可用：`xxx --version`

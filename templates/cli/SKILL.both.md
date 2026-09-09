@@ -19,7 +19,7 @@ description: "{{description}}"
 
 | Command / 命令 | Purpose / 用途 | Example / 示例 |
 | --- | --- | --- |
-| `xxx &lt;sub&gt;` | ... | `xxx &lt;sub&gt; --flag` |
+| `xxx <sub>` | ... | `xxx <sub> --flag` |
 
 ## Standard Workflow / 标准工作流
 1. Verify / 验证：`xxx --version`

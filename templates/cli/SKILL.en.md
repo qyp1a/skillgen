@@ -20,7 +20,7 @@ description: "{{description}}"
 
 | Command | Purpose | Example |
 | --- | --- | --- |
-| `xxx &lt;sub&gt;` | ... | `xxx &lt;sub&gt; --flag` |
+| `xxx <sub>` | ... | `xxx <sub> --flag` |
 
 ## Standard Workflow
 1. Verify tool availability: `xxx --version`
