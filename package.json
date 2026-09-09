@@ -15,7 +15,9 @@
     "node": ">=18"
   },
   "scripts": {
-    "test": "node test/run-tests.js"
+    "test": "node test/run-tests.js",
+    "check": "npm test && npm pack --dry-run --cache .npm-cache",
+    "prepublishOnly": "npm test"
   },
   "keywords": [
     "agent-skills",
@@ -33,5 +35,17 @@
     "scaffold"
   ],
   "license": "MIT",
-  "author": "qyp1a"
+  "author": "qyp1a",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/qyp1a/skillgen.git"
+  },
+  "bugs": {
+    "url": "https://github.com/qyp1a/skillgen/issues"
+  },
+  "homepage": "https://github.com/qyp1a/skillgen#readme",
+  "publishConfig": {
+    "access": "public"
+  },
+  "preferGlobal": true
 }

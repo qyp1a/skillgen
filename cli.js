@@ -14,22 +14,34 @@ import { makeT } from './lib/i18n.js';
 
 const pkg = JSON.parse(readFileSync(new URL('./package.json', import.meta.url), 'utf8'));
 
-const { values } = parseArgs({
-  options: {
-    name: { type: 'string' },
-    desc: { type: 'string' },
-    'desc-en': { type: 'string' },
-    type: { type: 'string' },
-    lang: { type: 'string' },
-    ui: { type: 'string' },
-    author: { type: 'string' },
-    force: { type: 'boolean', default: false },
-    yes: { type: 'boolean', default: false },
-    'list-types': { type: 'boolean', default: false },
-    version: { type: 'boolean', default: false },
-    help: { type: 'boolean', default: false }
+function parseCliArgs() {
+  try {
+    return parseArgs({
+      options: {
+        name: { type: 'string' },
+        desc: { type: 'string' },
+        'desc-en': { type: 'string' },
+        type: { type: 'string' },
+        lang: { type: 'string' },
+        ui: { type: 'string' },
+        author: { type: 'string' },
+        examples: { type: 'boolean', default: false },
+        force: { type: 'boolean', default: false },
+        yes: { type: 'boolean', default: false },
+        'list-types': { type: 'boolean', default: false },
+        version: { type: 'boolean', default: false },
+        help: { type: 'boolean', default: false }
+      }
+    }).values;
+  } catch (err) {
+    console.error(`✗ ${err.message}`);
+    console.error('Run skillgen --help for usage.');
+    process.exitCode = 1;
+    return null;
   }
-});
+}
+
+const values = parseCliArgs();
 
 function detectUiLang() {
   const env = (process.env.LANG || process.env.LC_ALL || '').toLowerCase();
@@ -76,13 +88,14 @@ ${t('version')} / ${t('help')}
 
 参数 / Options:
   --name <name>     ${t('uiName')}
-  --desc <text>     ${t('uiDesc')}
+  --desc <text>     ${t('uiDescZh')}
   --desc-en <text>  ${t('uiDescEn')}
   --type <type>     basic | cli | workflow | mcp
   --lang <lang>     zh | en | both
   --ui <lang>       CLI 界面语言 / UI language: zh | en (default: auto)
   --author <name>   ${t('uiAuthor')}
-  --force           覆盖已存在目录 / overwrite existing directory
+  --examples        生成示例脚本 / include an example script
+  --force           覆盖同名生成文件 / overwrite generated files with the same names
   --yes             跳过交互，使用默认值 / skip prompts, use defaults
 `);
 }
@@ -100,14 +113,22 @@ async function runInteractive(t) {
       error: t('nameInvalid')
     });
 
-    const desc = await session.ask(t('uiDesc'), { validate: () => true, def: `A ${name} skill.` });
-
     const type = await session.choose(t('uiType'), TYPES, (k) => t(`types.${k}`));
     const lang = await session.choose(t('uiLang'), LANGS, (k) => t(`langs.${k}`));
 
+    let desc;
     let descEn;
-    if (lang === 'both') {
-      descEn = await session.ask(t('uiDescEn'), { validate: () => true, def: desc });
+    if (lang === 'zh' || lang === 'both') {
+      desc = await session.ask(t('uiDescZh'), {
+        validate: () => true,
+        def: t('defaultDescZh').replace('{{name}}', name)
+      });
+    }
+    if (lang === 'en' || lang === 'both') {
+      descEn = await session.ask(t('uiDescEn'), {
+        validate: () => true,
+        def: t('defaultDescEn').replace('{{name}}', name)
+      });
     }
     const author = await session.ask(t('uiAuthor'), { validate: () => true, def: gitUserName() });
 
@@ -115,13 +136,20 @@ async function runInteractive(t) {
     if (!force && existsSync(join(process.cwd(), name))) {
       force = await session.confirm(t('uiOverwrite'));
     }
-    return { name, desc, descEn, type, lang, author, force };
+    return { name, desc, descEn, type, lang, author, force, examples: values.examples };
   } finally {
     session.close();
   }
 }
 
 async function main() {
+  if (!values) return;
+  if (values.ui && !['zh', 'en'].includes(values.ui)) {
+    console.error('✗ Invalid --ui value. Choose: zh, en');
+    process.exitCode = 1;
+    return;
+  }
+
   const ui = resolveUiLang();
   const t = makeT(ui);
 
@@ -139,19 +167,45 @@ async function main() {
   }
 
   let opts;
-  const nonInteractive = values.name && values.type && values.lang;
+  const generationArgs = [
+    values.name,
+    values.desc,
+    values['desc-en'],
+    values.type,
+    values.lang,
+    values.author
+  ];
+  const nonInteractive = values.yes || generationArgs.some((value) => value !== undefined);
   if (nonInteractive) {
+    if (!values.name) {
+      console.error(t('missingName'));
+      process.exitCode = 1;
+      return;
+    }
+    if (!values.type) {
+      console.error(t('missingType'));
+      process.exitCode = 1;
+      return;
+    }
+    if (!values.lang) {
+      console.error(t('missingLang'));
+      process.exitCode = 1;
+      return;
+    }
     if (!validateName(values.name)) {
       console.error(t('nameInvalid'));
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     if (!TYPES.includes(values.type)) {
       console.error(`${t('typeInvalid')}${TYPES.join(', ')}`);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     if (!LANGS.includes(values.lang)) {
       console.error(`${t('langInvalid')}${LANGS.join(', ')}`);
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
     opts = {
       name: values.name,
@@ -160,7 +214,8 @@ async function main() {
       type: values.type,
       lang: values.lang,
       author: values.author || (values.yes ? gitUserName() : undefined),
-      force: values.force
+      force: values.force,
+      examples: values.examples
     };
     if (!opts.author && !values.yes) {
       const session = promptSession();
@@ -172,7 +227,8 @@ async function main() {
     }
     if (!opts.force && existsSync(join(process.cwd(), opts.name))) {
       console.error(t('dirExists'));
-      process.exit(1);
+      process.exitCode = 1;
+      return;
     }
   } else {
     opts = await runInteractive(t);
@@ -183,11 +239,16 @@ async function main() {
     console.log(`\n${t('generated')} ${dir}`);
     console.log(`${t('files')}`);
     for (const f of files) console.log(`  - ${f}`);
-    console.log(`\n${t('nextSteps')} ${t('nextStepInstall').replace('<name>', opts.name)}`);
+    console.log(`\n${t('nextSteps')} ${t('nextStepInstall').replaceAll('<name>', opts.name)}`);
   } catch (err) {
     console.error(`✗ ${err.message}`);
-    process.exit(1);
+    process.exitCode = 1;
   }
 }
 
-main();
+if (values) {
+  main().catch((err) => {
+    console.error(`✗ ${err.message}`);
+    process.exitCode = 1;
+  });
+}
