@@ -1,0 +1,37 @@
+{
+  "name": "skillgen",
+  "version": "0.1.0",
+  "description": "Generate standards-compliant Agent Skills (SKILL.md) for Codex / Claude / Gemini / Cursor. Interactive, bilingual (中文/English), zero-dependency.",
+  "type": "module",
+  "bin": {
+    "skillgen": "cli.js"
+  },
+  "files": [
+    "cli.js",
+    "lib",
+    "templates"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node test/run-tests.js"
+  },
+  "keywords": [
+    "agent-skills",
+    "skill",
+    "skills",
+    "codex",
+    "claude-code",
+    "gemini-cli",
+    "cursor",
+    "cli",
+    "template",
+    "generator",
+    "SKILL.md",
+    "agents",
+    "scaffold"
+  ],
+  "license": "MIT",
+  "author": "qyp1a"
+}
