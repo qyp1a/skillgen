@@ -73,7 +73,7 @@ async function main() {
   process.exit(failed === 0 ? 0 : 1);
 }
 
-main().catch((e) =&gt; {
+main().catch((e) => {
   console.error(e);
   process.exit(1);
 });
