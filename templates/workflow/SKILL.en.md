@@ -23,7 +23,7 @@ description: "{{description}}"
 - **Actions:** ...
 - **Output:** ...
 
-## Inputs &amp; Outputs
+## Inputs & Outputs
 
 | Stage | Input | Output |
 | --- | --- | --- |
