@@ -47,13 +47,13 @@ $ npx skillgen
   2. CLI 工具封装
   3. 多步骤工作流
   4. MCP 连接
-&gt; 3
+> 3
 
 生成模板的语言:
   1. 中文
   2. English
   3. 中英双语
-&gt; 3
+> 3
 
 ✓ 已生成 C:\...\my-skill\
 ```
@@ -126,7 +126,7 @@ node cli.js --list-types
 ## Roadmap
 
 - [ ] 更多模板类型：数据技能、文档技能、浏览器自动化
-- [ ] `skillgen check &lt;dir&gt;`：校验已有 SKILL.md 的格式与最佳实践
+- [ ] `skillgen check <dir>`：校验已有 SKILL.md 的格式与最佳实践
 - [ ] `skillgen init`：从已有脚本自动推断生成 SKILL.md
 - [ ] GitHub Action：自动校验 PR 中的 SKILL.md
 

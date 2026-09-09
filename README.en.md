@@ -40,20 +40,20 @@ node cli.js
 ```bash
 $ npx skillgen
 Skill name (lowercase letters/digits/hyphens, e.g. my-skill): my-skill
-Skill description (one sentence: what it does &amp; when to use): Automate report processing
+Skill description (one sentence: what it does & when to use): Automate report processing
 
 Choose a template type:
   1. Basic skill (general knowledge / workflow)
   2. CLI tool wrapper
   3. Multi-step workflow
   4. MCP connection
-&gt; 3
+> 3
 
 Template language:
   1. 中文
   2. English
   3. Bilingual (中英双语)
-&gt; 3
+> 3
 
 ✓ Generated ./my-skill/
 ```
@@ -126,7 +126,7 @@ node cli.js --list-types
 ## Roadmap
 
 - [ ] More template types: data skills, document skills, browser automation
-- [ ] `skillgen check &lt;dir&gt;`: validate existing SKILL.md files against best practices
+- [ ] `skillgen check <dir>`: validate existing SKILL.md files against best practices
 - [ ] `skillgen init`: auto-generate SKILL.md from existing scripts
 - [ ] GitHub Action: validate SKILL.md in PRs
 
