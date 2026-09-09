@@ -1,134 +1,127 @@
-# skillgen · Skill 模板生成器
+# skillgen · Agent Skill 模板生成器
 
-一行命令生成符合 [Agent Skills 标准](https://agentskills.io) 的 `SKILL.md` 项目骨架，开箱支持 **Codex / Claude Code / Gemini CLI / Cursor**，**中英双语**，**零依赖**（只用 Node 内置模块）。
+一个零依赖的 Node.js CLI，用来生成结构清晰、可继续编辑的 `SKILL.md` 项目。支持交互式与非交互式运行，并提供中文、英文和中英双语模板。
 
-[English README](README.en.md) | [报告 Issue](https://github.com/qyp1a/skillgen/issues)
+[English README](README.en.md) · [报告问题](https://github.com/qyp1a/skillgen/issues) · [贡献指南](CONTRIBUTING.md)
 
-## 为什么用 skillgen
+## 特性
 
-- **写一次，到处用**：生成的 SKILL.md 遵循 Agent Skills 标准，Codex、Claude Code、Gemini CLI、Cursor 都能直接识别。
-- **中英双语**：CLI 界面和生成的模板都支持中文 / English / 中英双语三种模式。
-- **4 种专业模板**：基础技能、CLI 工具封装、多步骤工作流、MCP 连接，每个模板带中文注释指导。
-- **零依赖**：只用 Node 内置模块，`npx` 即用，无需安装任何包。
-- **开箱即用**：自动生成 `SKILL.md` + `scripts/` + `assets/` + `README.md` + MIT `LICENSE`，克隆下来就是可发布的技能仓库。
+- **零运行时依赖**：只使用 Node.js 内置模块。
+- **4 类模板**：基础技能、CLI 工具、多步骤工作流、MCP 连接。
+- **双语支持**：CLI 和模板支持 `zh`、`en`、`both`。
+- **安全的 YAML frontmatter**：自动转义引号、反斜杠等内容。
+- **精简默认输出**：默认只生成必要的技能与发布文件；示例脚本按需启用。
+- **可自动化**：完整支持命令行参数，适合脚本和 CI。
 
 ## 快速开始
 
-### 方式一：npx（无需安装）
+无需安装：
 
 ```bash
 npx skillgen
 ```
 
-### 方式二：全局安装
+全局安装：
 
 ```bash
-npm i -g skillgen
+npm install --global skillgen
 skillgen
 ```
 
-### 方式三：克隆本仓库直接运行
+从源码运行：
 
 ```bash
 git clone https://github.com/qyp1a/skillgen.git
 cd skillgen
+npm test
 node cli.js
 ```
 
-## 交互式用法
-
-```bash
-$ npx skillgen
-技能名称（小写字母/数字/连字符，如 my-skill）: my-skill
-技能描述（一句话：做什么、何时用）: 自动化处理报表的技能
-
-选择模板类型:
-  1. 基础技能（通用知识/流程）
-  2. CLI 工具封装
-  3. 多步骤工作流
-  4. MCP 连接
-> 3
-
-生成模板的语言:
-  1. 中文
-  2. English
-  3. 中英双语
-> 3
-
-✓ 已生成 C:\...\my-skill\
-```
+要求 Node.js 18 或更高版本。
 
 ## 非交互用法
 
 ```bash
-npx skillgen --name my-skill --type workflow --lang both \
-  --desc "自动处理报表" --desc-en "Automate report processing" --author you
+npx skillgen \
+  --name report-workflow \
+  --type workflow \
+  --lang both \
+  --desc "当用户需要生成或校验报表时使用" \
+  --desc-en "Use when the user needs to generate or validate reports" \
+  --author "Your Name" \
+  --yes
 ```
+
+常用参数：
 
 | 参数 | 说明 |
 | --- | --- |
-| `--name` | 技能名称（小写字母/数字/连字符） |
-| `--desc` / `--desc-en` | 描述（中 / 英，both 模式可同时提供） |
-| `--type` | `basic` \| `cli` \| `workflow` \| `mcp` |
-| `--lang` | `zh`（中文）\| `en`（English）\| `both`（中英双语） |
-| `--ui` | CLI 界面语言 `zh` \| `en`（默认自动检测） |
-| `--author` | 作者名（用于 LICENSE / README） |
-| `--force` | 覆盖已存在的目录 |
-| `--yes` | 跳过交互，使用默认值 |
-| `--list-types` | 列出全部模板类型 |
-| `--version` / `--help` | 版本 / 帮助 |
+| `--name` | 技能名称，最多 64 个字符，只允许小写字母、数字和连字符 |
+| `--type` | `basic`、`cli`、`workflow` 或 `mcp` |
+| `--lang` | `zh`、`en` 或 `both` |
+| `--desc` | 中文或主要描述 |
+| `--desc-en` | 英文描述；`both` 模式下会与中文描述一起写入 frontmatter |
+| `--author` | README 和 LICENSE 中使用的作者名 |
+| `--examples` | 额外生成 `scripts/example.js` |
+| `--force` | 允许写入已存在目录，仅覆盖本次生成的同名文件，不删除其他文件 |
+| `--yes` | 跳过交互并使用默认值 |
+| `--ui` | CLI 界面语言：`zh` 或 `en` |
+| `--list-types` | 列出模板类型 |
+| `--version` / `--help` | 显示版本或帮助 |
 
 ## 模板类型
 
-| 类型 | 适用场景 | 模板重点 |
+| 类型 | 适用场景 | 内容重点 |
 | --- | --- | --- |
-| `basic` | 通用知识 / 流程技能 | 概述、触发条件、工作流、示例、最佳实践、故障排查 |
-| `cli` | 封装命令行工具 | 前置检查、命令速查、标准工作流、输出解析、故障处理 |
-| `workflow` | 多步骤流水线 | 阶段划分、输入输出表、质量门禁、失败恢复 |
-| `mcp` | 连接 MCP 服务 | 服务配置、工具清单、使用模式、错误处理 |
+| `basic` | 通用知识或流程 | 触发条件、步骤、示例、故障排查 |
+| `cli` | 命令行工具封装 | 前置检查、命令速查、输出与失败处理 |
+| `workflow` | 多阶段流水线 | 阶段输入输出、质量门禁、失败恢复 |
+| `mcp` | MCP 服务使用指南 | 服务配置、工具清单、调用模式、错误处理 |
 
-## 生成的项目结构
+## 完整示例
 
+[`examples/skills/`](examples/README.md) 提供 6 个已经写完整的 Skill，覆盖 GitHub 发布准备、双语 README 同步、Node CLI 回归测试、Skill 质量审查、Changelog 编写和 npm 发布检查。示例放在普通目录下，因此克隆仓库后不会被 Codex 自动激活。
+
+## 生成结果
+
+默认结构：
+
+```text
+report-workflow/
+├── SKILL.md
+├── README.md
+└── LICENSE
 ```
-my-skill/
-├── SKILL.md          # 技能定义（主入口，Agent 首先读取）
-├── scripts/          # 可执行脚本目录
-│   └── example.js    # 示例脚本（占位，可替换）
-├── assets/           # 参考资源目录
-├── README.md         # 安装说明（双语）
-└── LICENSE           # MIT 许可
-```
 
-## 如何安装生成的技能
+添加 `--examples` 后会额外生成 `scripts/example.js`。`scripts/`、`references/`、`assets/` 和 `agents/openai.yaml` 都是可选资源，应在确实需要时添加，而不是作为空目录预生成。
 
-**Codex：**
+## 在 Codex 中使用
+
+- 项目级技能：放到仓库的 `.agents/skills/<skill-name>/`。
+- 用户级技能：放到 `$HOME/.agents/skills/<skill-name>/`。
+- 从 GitHub 安装个人使用的技能：在 Codex 中调用 `$skill-installer` 并提供仓库地址。
+- 面向他人分发可安装内容时，OpenAI 当前建议将技能打包成 Plugin。
+
+其他支持 Agent Skills 的工具可能使用不同的扫描目录，请以对应工具的文档为准。
+
+参见 [OpenAI 官方 Build skills 文档](https://learn.chatgpt.com/docs/build-skills) 和 [Agent Skills 规范](https://agentskills.io/specification)。
+
+## 开发与检查
 
 ```bash
-codex install ./my-skill
-# 或复制到 ~/.codex/skills/
-```
-
-**Claude Code：**
-
-```bash
-cp -r my-skill ~/.claude/skills/
-```
-
-**通用：** 把目录放进 Agent 的 skills 路径即可，`SKILL.md` 中的 `name` / `description` 会被自动识别。
-
-## 开发
-
-```bash
-npm test        # 运行自动化测试（4 类型 × 3 语言全矩阵）
+npm test
+npm run check
 node cli.js --list-types
 ```
 
+测试覆盖 4 种模板 × 3 种语言、YAML 转义、双语描述、可选示例脚本和常见 CLI 错误。
+
 ## Roadmap
 
-- [ ] 更多模板类型：数据技能、文档技能、浏览器自动化
-- [ ] `skillgen check <dir>`：校验已有 SKILL.md 的格式与最佳实践
-- [ ] `skillgen init`：从已有脚本自动推断生成 SKILL.md
-- [ ] GitHub Action：自动校验 PR 中的 SKILL.md
+- [ ] `skillgen check <dir>`：校验已有技能
+- [ ] 可选生成 `agents/openai.yaml`
+- [ ] Plugin 打包支持
+- [ ] 更多面向真实任务的模板
 
 ## License
 
